@@ -1,0 +1,135 @@
+/* ================================================================
+ *  YT+ 手机端「暖纸 · 深蓝 × 芽绿」设计体系
+ *  页面底色与安卓壳闪屏/安装页 (#FAF7F2) 一致，闪屏 → 网页无色差跳变。
+ *  仅供 /mobile 页面使用；单主题，不写暗色模式适配。
+ * ================================================================ */
+
+:root {
+  /* 底色与文字 */
+  --mob-bg: #faf7f2;        /* 页面底（暖纸白，与壳闪屏一致）*/
+  --mob-card: #ffffff;
+  --mob-ink: #2d3b4f;       /* 主文字 */
+  --mob-ink-2: #76808e;     /* 次要文字 */
+  --mob-line: #ece5d9;      /* 分隔线（暖调）*/
+  --mob-soft: #f3eee4;      /* 暖调浅填充：分段条/chip/徽标底（--mob-line 的浅色衍生）*/
+  /* 品牌 */
+  --mob-brand: #2f3e8c;     /* 深蓝主色：主按钮、链接、强调 */
+  --mob-brand-press: #273379;
+  --mob-lime: #a9bd2c;      /* 芽绿点缀：成功态、进度、徽标，克制使用 */
+  /* 业务色板（图标色块多彩化核心）*/
+  --biz-po: #3e6fb0;        /* 采购订单 蓝 */
+  --biz-recv: #5d9c46;      /* 采购入库 绿 */
+  --biz-out: #d97642;       /* 出库/出库申请 橙 */
+  --biz-loan: #8a6fbf;      /* 借料 紫 */
+  --biz-inv: #3d9b9b;       /* 库存 青 */
+  --biz-approve: #d9a02e;   /* 审批/待办 琥珀 */
+  --biz-danger: #c0564f;    /* 驳回/退回 红 */
+}
+
+/* ============ 按压反馈（手机端统一，替代各页各自为政的 :active）============
+   手机上没有悬停，"有没有点到"全靠按下瞬间：轻微下沉 + 背景微深，松手回弹。 */
+.mob-card,
+.mob-grid-card,
+.mob-stock-card.tap,
+.mob-txn-card,
+.mob-btn,
+.mob-chip,
+.mob-seg-btn,
+.mob-list-btn,
+.mf-pick,
+.mf-submit-btn,
+.mdoc-act {
+  transition: transform .12s ease-out, background-color .12s ease, box-shadow .16s ease, opacity .12s ease;
+  -webkit-tap-highlight-color: transparent;   /* 关掉安卓默认蓝色块，用自己的反馈 */
+}
+.mob-card:active,
+.mob-grid-card:active,
+.mob-stock-card.tap:active,
+.mob-txn-card:active {
+  transform: scale(.978);
+  background-color: #f5f0e7;
+}
+.mob-btn:active,
+.mob-chip:active,
+.mob-seg-btn:active {
+  transform: scale(.96);
+}
+/* 建单/详情子页 */
+.mf-pick:active { transform: scale(.97); background-color: #f5f0e7; }
+.mf-submit-btn:active:not(:disabled),
+.mdoc-act:active { transform: scale(.97); }
+
+/* 可点卡片的"能按"暗示：右侧箭头按下时轻微右移 */
+.mob-card-arrow { transition: transform .12s ease; }
+.mob-card:active .mob-card-arrow,
+.mob-stock-card.tap:active .mob-card-arrow { transform: translateX(2px); }
+
+/* ============ 页面/页签切换过渡 ============
+   用法：<transition name="mob-fade" mode="out-in"> 包路由出口或页签容器 */
+.mob-fade-enter-active {
+  transition: opacity .18s ease-out, transform .18s ease-out;
+}
+.mob-fade-leave-active {
+  transition: opacity .12s ease-in;
+}
+.mob-fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.mob-fade-leave-to {
+  opacity: 0;
+}
+
+/* ============ 卡片入场（列表 stagger：animation-delay: min(i*40ms, 320ms)）============
+   fill-mode 用 backwards：延迟期间保持透明，播完即交还 transform 给按压反馈。 */
+@keyframes mob-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mob-rise {
+  animation: mob-rise .28s cubic-bezier(.2, .7, .3, 1) backwards;
+}
+
+/* ============ 骨架屏 shimmer ============ */
+.mob-skel {
+  display: block;
+  border-radius: 8px;
+  background: #efe9df;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 60%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .55) 50%, rgba(255, 255, 255, 0) 100%);
+    animation: mob-skel-move 1.2s ease-in-out infinite;
+  }
+}
+@keyframes mob-skel-move {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(280%); }
+}
+
+/* 骨架屏结构件：卡片轮廓 + 条形，页面直接拼 */
+.mob-skel-list { display: flex; flex-direction: column; gap: 12px; }
+.mob-skel-card {
+  background: var(--mob-card);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 1px 2px rgba(66, 54, 32, .05), 0 10px 28px rgba(66, 54, 32, .08);
+}
+.mob-skel-card.slim { padding: 12px 14px; border-radius: 14px; }
+.mob-skel-row { display: flex; align-items: center; gap: 12px; }
+.mob-skel-ico { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; }
+.mob-skel-lines { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.mob-skel-line { height: 12px; }
+.mob-skel-line.w30 { width: 30%; }
+.mob-skel-line.w40 { width: 40%; }
+.mob-skel-line.w50 { width: 50%; }
+.mob-skel-line.w60 { width: 60%; }
+.mob-skel-line.w70 { width: 70%; }
+.mob-skel-line.w80 { width: 80%; }

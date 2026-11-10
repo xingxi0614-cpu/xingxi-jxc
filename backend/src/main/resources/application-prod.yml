@@ -1,0 +1,44 @@
+server:
+  # 信任内网反向代理(Docker 里的 Nginx)传来的 X-Forwarded-Proto/For:前面加了 HTTPS 时,
+  # 后端才知道浏览器用的是 https,跨域判断、Secure Cookie 才对得上。只信任内网地址发来的这些头。
+  forward-headers-strategy: native
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: ${SERVER_PORT:18080}
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN:5}
+
+knife4j:
+  enable: ${KNIFE4J_ENABLE:false}
+
+# 2026-10-18 方案 A:knife4j.enable=false 只关了 doc.html 外壳,底下的接口说明书(/v3/api-docs)仍开着,
+# 生产只靠 nginx 404 一层挡。这里在程序里也关掉,变成两层。
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+logging:
+  file:
+    name: ${LOG_FILE:/data/scm/logs/scm-backend.log}
+  level:
+    root: INFO
+    com.group.scm: INFO
+
+scm:
+  inv:
+    avg-scale: ${SCM_INV_AVG_SCALE:2}
+  upload:
+    path: ${SCM_UPLOAD_PATH:/data/scm/upload}
+  cors:
+    # 前后端同域(Docker 安装经 Nginx 转发)不需要配;前端单独部署在别的域名时填,多个用逗号分隔
+    allowed-origin-patterns: ${SCM_CORS_ALLOWED_ORIGIN_PATTERNS:}
+  initialization:
+    enabled: ${SCM_INITIALIZATION_ENABLED:false}

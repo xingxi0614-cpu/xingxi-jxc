@@ -1,0 +1,13 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
+    "types": ["node", "vite/client", "element-plus/global"],
+    "allowImportingTsExtensions": false,
+    "strict": false,
+    "verbatimModuleSyntax": false
+  },
+  "include": ["src/**/*", "src/**/*.vue"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

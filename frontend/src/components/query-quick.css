@@ -1,0 +1,119 @@
+/*
+  快速查询行(QueryDrawer.vue 的一部分,样式单独成文件):表格上方一行常用条件,方案 B(2026-10-16 用户改定)。
+  这一行在卡片里面,styles/index.scss 给老式平铺查询区的规则(表单排成网格、每项占满一格、最后一格带按钮的
+  缩成自身宽度靠右、勾选框最宽 180px)都会套进来,所以下面布局相关的写法都带 !important 盖住。
+*/
+.qp-quickbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  background: var(--el-fill-color-lighter);
+}
+
+/* 条件和右边的按钮排在同一行里(容器本身不占位),宽屏一行放下,窄一点自动折到第二行 */
+.qp-quickbar-body,
+.qp-quickbar .qp-form,
+.qp-quickbar .qp-form .el-form,
+.qp-quickbar .qp-form .el-form--inline {
+  display: contents !important;
+}
+
+/* 每项:条件名在左、输入框在右 */
+.qp-quickbar .qp-form .el-form .el-form-item {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  grid-column: auto !important;
+  justify-self: auto !important;
+}
+
+/* × 和"等于/包含"只在弹窗里用 */
+.qp-quickbar .qp-row-x,
+.qp-quickbar .qp-row-pin,
+.qp-quickbar .qp-row-op {
+  display: none;
+}
+
+.qp-quickbar .qp-form .el-form .el-form-item__label {
+  display: block !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 32px !important;
+  white-space: nowrap;
+}
+
+.qp-quickbar .qp-form .el-form-item__content {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 140px;
+  min-width: 0;
+}
+
+.qp-quickbar .qp-form .el-form-item__content > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 日期区间要放下两个完整日期(10-13 用户反馈过日期被截断):单给宽一点,字号小一号 */
+.qp-quickbar .qp-form .el-form-item:has(.el-date-editor--daterange) .el-form-item__content {
+  width: 228px;
+}
+
+.qp-quickbar .el-range-editor .el-range-input {
+  font-size: 12px;
+}
+
+.qp-quickbar .el-range-editor .el-range-separator {
+  flex: 0 0 auto;
+  padding: 0 2px;
+}
+
+.qp-quickbar .qp-form .el-input,
+.qp-quickbar .qp-form .el-select,
+.qp-quickbar .qp-form .el-date-editor,
+.qp-quickbar .qp-form .el-date-editor.el-input__wrapper,
+.qp-quickbar .qp-form .el-date-editor--daterange {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* 条件下面附带的长说明文字(目前只有现存量「物料关键字」的 .kw-tip)在一行里放不下,这里不显示;完整说明在「更多条件」里 */
+.qp-quickbar .kw-tip {
+  display: none;
+}
+
+/* 按钮紧跟在最后一个条件后面(原型如此);放不下时整组折到下一行最左边,不要靠右(10-16 用户反馈"查询跑到右边") */
+.qp-quickbar-actions {
+  display: flex;
+  margin-left: 4px;
+  align-items: center;
+  gap: 8px;
+}
+
+.qp-quickbar-actions .el-button + .el-button {
+  margin-left: 0;
+}
+
+/* 单选按钮组 / 勾选框 / 开关按自己的宽度排成一行。统一 140px 宽会把「按公司 / 按仓库」挤成上下两行（2026-10-17 用户截图收发存汇总表） */
+.qp-quickbar .qp-form .el-form-item:has(.el-radio-group, .el-checkbox-group, .el-switch) .el-form-item__content {
+  width: auto;
+}
+.qp-quickbar .qp-form .el-radio-group,
+.qp-quickbar .qp-form .el-checkbox-group {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}

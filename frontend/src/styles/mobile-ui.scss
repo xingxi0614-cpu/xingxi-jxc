@@ -1,0 +1,183 @@
+/* ================================================================
+ *  手机端「分组列表」版式
+ *
+ *  只借版式，不换配色：颜色仍全部取自 mobile.scss 的 --mob-* / --biz-*。
+ *
+ *  核心思路：从「厚阴影大卡片 + 标签在上、输入框在下」改成
+ *           「分组列表 + 标签在左、内容在右」——手机系统设置页那种。
+ *
+ *  🔴 这份是全局样式（main.ts 引入一次），类名统一 mx- 前缀，避免和电脑端撞名。
+ *     建单页（views/mobile/*.vue）和首页都在用，改这里会同时影响它们。
+ * ================================================================ */
+
+/* ---------- 建单页骨架：顶栏 + 可滚动正文 + 底部按钮栏 ---------- */
+.mx-page { height: 100vh; display: flex; flex-direction: column; background: var(--mob-bg); color: var(--mob-ink); font-size: 15px; }
+.mx-top {
+  display: flex; align-items: center; flex-shrink: 0;
+  min-height: 48px; padding: env(safe-area-inset-top) 4px 0;
+  background: #fff; border-bottom: 1px solid var(--mob-line);
+}
+.mx-top__back {
+  width: 44px; height: 44px; border: 0; background: none; color: var(--mob-ink);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  &:active { opacity: .5; }
+}
+/* 右边留 44px 抵掉返回键，标题才是真居中 */
+.mx-top__title { flex: 1; margin-right: 44px; text-align: center; font-size: 16px; font-weight: 650; }
+.mx-body { flex: 1; overflow-y: auto; padding-bottom: 24px; }
+/* 顶部的「已结账 / 盘点中」提示条（DocGuardHint）：和分组对齐 */
+.mx-body > .mx-guard.doc-guard-hint { margin: 12px 14px 0; }
+
+.mx-bar {
+  display: flex; gap: 10px; flex-shrink: 0;
+  padding: 10px 14px calc(14px + env(safe-area-inset-bottom));
+  background: #fff; border-top: 1px solid var(--mob-line);
+}
+.mx-bar__btn {
+  height: 46px; border-radius: 11px; font-size: 15px; cursor: pointer;
+  transition: transform .12s ease-out, opacity .12s ease;
+  -webkit-tap-highlight-color: transparent;
+  &:active:not(:disabled) { transform: scale(.97); }
+  &:disabled { opacity: .5; }
+}
+.mx-bar__btn--ghost { flex: 0 0 96px; border: 1px solid var(--mob-line); background: #fff; color: var(--mob-ink-2); }
+.mx-bar__btn--main { flex: 1; border: 0; background: var(--mob-brand); color: #fff; font-weight: 650; }
+
+/* ---------- 分组列表 ---------- */
+.mx-g { margin: 14px 14px 0; }
+.mx-g__label {
+  display: flex; align-items: center; gap: 6px; padding: 0 4px 6px;
+  font-size: 12.5px; color: var(--mob-ink-2);
+  b { font-weight: 650; color: var(--mob-ink); }
+}
+.mx-g__more {
+  margin-left: auto; padding: 0; border: 0; background: none;
+  font-size: 12.5px; color: var(--mob-brand); cursor: pointer;
+  &.is-danger { color: var(--biz-danger); }
+}
+.mx-g__box { overflow: hidden; background: #fff; border-radius: 12px; }
+
+/* 组内一行。分隔线左缩进 14px、不通栏——分组列表的标志性细节 */
+.mx-row {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  width: 100%; min-height: 48px; padding: 8px 14px;
+  border: 0; background: transparent; text-align: left;
+  font-size: 15px; color: var(--mob-ink);
+  -webkit-tap-highlight-color: transparent;
+
+  & + .mx-row::before,
+  .mx-note + &::before {
+    position: absolute; top: 0; left: 14px; right: 0; height: 1px;
+    background: var(--mob-soft); content: '';
+  }
+}
+button.mx-row { cursor: pointer; &:active { background: #f6f2ea; } }
+
+.mx-row__label {
+  flex: 0 0 86px; font-size: 14px; color: var(--mob-ink-2);
+  i { margin-left: 2px; font-style: normal; color: var(--biz-danger); }
+}
+.mx-row__val {
+  flex: 1; min-width: 0; overflow: hidden; text-align: right;
+  text-overflow: ellipsis; white-space: nowrap;
+  &.is-ph { color: #b9b3a6; }
+  /* 折行显示全称（物料名不能被省略号吃掉） */
+  &.is-wrap { white-space: normal; overflow: visible; line-height: 1.4; }
+}
+.mx-row__chev { flex: 0 0 auto; color: #cec6b4; }
+/* 行内直接输入。字号 16px：iOS 上小于 16px 的输入框一点就会把整页放大 */
+.mx-row__input {
+  flex: 1; min-width: 0; height: 30px; padding: 0;
+  border: 0; outline: 0; background: transparent;
+  font-size: 16px; color: var(--mob-ink); text-align: right;
+  &::placeholder { color: #b9b3a6; }
+}
+
+/* 左图标 + 标题副标题（首页待办、单据那种功能行） */
+.mx-row--app { min-height: 58px; }
+.mx-row__tt {
+  flex: 1; min-width: 0;
+  b { display: block; overflow: hidden; font-size: 15px; font-weight: 650; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+  span { display: block; overflow: hidden; font-size: 12px; color: var(--mob-ink-2); text-overflow: ellipsis; white-space: nowrap; }
+}
+.mx-row__r {
+  flex: 0 0 auto; text-align: right; font-size: 12px; color: var(--mob-ink-2); white-space: nowrap;
+  b { display: block; font-size: 14px; color: var(--mob-ink); font-variant-numeric: tabular-nums; }
+}
+
+/* 行下方的说明文字（小计、历史价、超量提示） */
+.mx-note {
+  position: relative; padding: 0 14px 9px; font-size: 12.5px; line-height: 1.5; color: var(--mob-ink-2); text-align: right;
+  &.is-bad { color: var(--biz-danger); font-weight: 600; }
+}
+/* 组里的整段提示（没有可选内容、选了订单才显示明细） */
+.mx-tip { padding: 26px 16px; text-align: center; font-size: 13.5px; line-height: 1.6; color: var(--mob-ink-2); b { display: block; font-size: 15px; color: var(--mob-ink); } }
+
+/* 单选行：选中的那行右边打勾 */
+.mx-row__check { flex: 0 0 auto; color: var(--mob-brand); font-weight: 700; }
+
+/* 「+ 加一行」 */
+.mx-add {
+  width: 100%; height: 46px; border: 0; border-radius: 12px; background: #fff;
+  font-size: 14.5px; font-weight: 650; color: var(--mob-brand); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  &:active { background: #f6f2ea; }
+}
+
+/* ---------- 业务卡片（一张单一张卡：状态 + 单号 + 标题 + 说明） ---------- */
+.mx-card {
+  display: block;
+  /* 宽度必须用 calc：width:100% 加左右外边距会比屏幕宽，width:auto 的 button 又会缩成内容宽（OA 手机端踩过两次） */
+  width: calc(100% - 28px); margin: 10px 14px 0; padding: 12px 14px;
+  border: 0; border-radius: 12px; background: #fff; text-align: left; cursor: pointer;
+  color: var(--mob-ink); -webkit-tap-highlight-color: transparent;
+  &:active { background: #f6f2ea; }
+}
+.mx-card__top { display: flex; align-items: center; gap: 8px; }
+.mx-card__no { flex: 1; overflow: hidden; font: 12px ui-monospace, Menlo, monospace; color: var(--mob-ink-2); text-overflow: ellipsis; white-space: nowrap; }
+.mx-card__title { margin: 6px 0 2px; font-size: 15.5px; font-weight: 650; line-height: 1.4; }
+.mx-card__meta { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 12.5px; color: var(--mob-ink-2); }
+
+.mx-badge {
+  flex: 0 0 auto; padding: 2px 7px; border-radius: 5px; font-size: 11.5px; font-weight: 650; white-space: nowrap;
+  background: rgba(47, 62, 140, .1); color: var(--mob-brand);
+  &.is-warn { background: rgba(217, 160, 46, .16); color: #a8650c; }
+}
+
+/* 搜索框（列表页顶部） */
+.mx-search {
+  display: block; width: calc(100% - 28px); height: 40px; margin: 12px 14px 0; padding: 0 12px;
+  border: 0; outline: 0; border-radius: 10px; background: var(--mob-soft);
+  font-size: 16px; color: var(--mob-ink);
+  &::placeholder { color: #a39c8d; }
+}
+
+/* ---------- 首页：三个数字块 + 快捷发起 ---------- */
+.mx-tiles { display: flex; gap: 10px; }
+.mx-tile {
+  flex: 1; min-width: 0; padding: 11px 12px; border: 0; border-radius: 12px; background: #fff;
+  text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform .12s ease-out;
+  &:active { transform: scale(.97); }
+  b { display: block; font-size: 23px; font-weight: 750; line-height: 1.2; color: #c5bca9; font-variant-numeric: tabular-nums; }
+  small { font-size: 12px; color: var(--mob-ink-2); }
+  &.is-hot b { color: var(--mob-brand); }
+  &.is-warn b { color: var(--biz-danger); }
+  /* 当前选中的那块：内描边，不用阴影 */
+  &.is-on { box-shadow: inset 0 0 0 1.5px var(--mob-brand); small { color: var(--mob-ink); font-weight: 650; } }
+}
+.mx-quick {
+  display: grid; grid-template-columns: repeat(4, 1fr); padding: 12px 4px;
+  button {
+    display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0;
+    border: 0; background: none; font-size: 12.5px; color: var(--mob-ink-2); cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    &:active { opacity: .6; }
+  }
+}
+
+/* 物料全称较长时允许折行（出库/入库明细的物料名不能被省略号吃掉，仓管要靠它对货） */
+.mx-row__tt--wrap b { white-space: normal; overflow: visible; }
+/* 明细合计（采购订单） */
+.mx-total { padding: 10px 4px 0; text-align: right; font-size: 13px; color: var(--mob-ink-2); font-variant-numeric: tabular-nums; }

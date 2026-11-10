@@ -1,0 +1,85 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: scm-backend
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      # 与前端/业务层 20MB 校验、Nginx 50MB 对齐；Spring 默认仅 1MB/10MB 会在进入业务前拒绝大附件
+      max-file-size: 20MB
+      max-request-size: 60MB
+  mvc:
+    async:
+      # 附件下载改为边读边写(安全审查 S08,2026-10-18),走异步请求;默认 30 秒会把慢网络上的大附件截断
+      request-timeout: 10m
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/scm?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${SPRING_DATASOURCE_USERNAME:scm}
+    password: ${SPRING_DATASOURCE_PASSWORD:scm@2026}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.group.scm.modules.*.entity
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.nologging.NoLoggingImpl}
+
+sa-token:
+  token-name: Authorization
+  timeout: 28800
+  active-timeout: 1800
+  # 允许同一账号在不同终端各在线一个（手机 + 电脑），同类终端仍互斥——
+  # 互斥由 AuthService 登录时按 device 主动踢旧会话实现，见 ClientDeviceUtil
+  is-concurrent: true
+  is-share: false
+  token-style: random-128
+  is-log: false
+  is-read-cookie: true
+
+knife4j:
+  enable: ${KNIFE4J_ENABLE:false}
+  setting:
+    language: zh_cn
+
+# 接口文档全环境关闭(2026-10-18):Boot 3.5 升级后,knife4j 4.4.0 自带的 springdoc 2.3.0
+# 与 Spring 6.2 不兼容,开着时访问 /v3/api-docs 直接报 NoSuchMethodError(假 ERROR)。没人在用,
+# 先关掉;将来真要文档再把 springdoc 升到 2.8.x(已在临时副本验证可用)或随 Boot 4 一起处理。
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+scm:
+  inv:
+    avg-scale: 2
+  session:
+    max-online-users: ${SCM_MAX_ONLINE_USERS:100}
+    idle-timeout-minutes: ${SCM_IDLE_TIMEOUT_MINUTES:30}
+    # 手机端空闲超时单独放宽（电脑端仍用上面的 30 分钟）：
+    # App 揣兜里随手一点就要重登太难用，2 小时是方便与安全的折中
+    app-idle-timeout-minutes: ${SCM_APP_IDLE_TIMEOUT_MINUTES:120}
+    cleanup-interval-ms: ${SCM_SESSION_CLEANUP_INTERVAL_MS:60000}
+  upload:
+    path: /data/scm/upload
+  toolbox:
+    # 工具箱生成的文件放这儿。生产由 env 注入(与 upload 同级),E2E 用 /tmp。
+    # 目录不存在时后端会自己建,但父目录必须可写 —— 否则任务会以「Read-only file system」失败。
+    path: ${SCM_TOOLBOX_PATH:/data/scm/toolbox}
+  initialization:
+    enabled: ${SCM_INITIALIZATION_ENABLED:false}

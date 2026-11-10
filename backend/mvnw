@@ -1,0 +1,55 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Maven Wrapper startup script for UN*X
+# ----------------------------------------------------------------------------
+set -e
+
+# Find the project basedir
+findBaseDir () {
+  SCRIPT="$0"
+  while [ -h "$SCRIPT" ] ; do
+    ls=$(ls -ld "$SCRIPT")
+    link=$(expr "$ls" : '.*-> \(.*\)$')
+    if expr "$link" : '/.*' > /dev/null; then
+      SCRIPT="$link"
+    else
+      SCRIPT="$(dirname "$SCRIPT")/$link"
+    fi
+  done
+  BASE_DIR=$(dirname "$SCRIPT")
+  echo "$(cd "$BASE_DIR"; pwd)"
+}
+
+BASE_DIR=$(findBaseDir)
+MAVEN_PROJECTBASEDIR="$BASE_DIR"
+
+# Download Maven if not cached
+WRAPPER_DIR="$MAVEN_PROJECTBASEDIR/.mvn/wrapper"
+WRAPPER_PROPERTIES="$WRAPPER_DIR/maven-wrapper.properties"
+
+if [ -f "$WRAPPER_PROPERTIES" ]; then
+  DISTRIBUTION_URL=$(grep "distributionUrl" "$WRAPPER_PROPERTIES" | sed 's/distributionUrl=//')
+fi
+
+# Check if mvn is already in PATH
+if command -v mvn > /dev/null 2>&1; then
+  exec mvn "$@"
+fi
+
+# Try to download and use
+MVN_HOME="$HOME/.m2/wrapper/maven-3.9.6"
+MVN_CMD="$MVN_HOME/bin/mvn"
+
+if [ ! -f "$MVN_CMD" ]; then
+  echo "Downloading Maven 3.9.6..."
+  mkdir -p "$MVN_HOME"
+  curl -fsSL "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.6/apache-maven-3.9.6-bin.tar.gz" \
+    | tar -xzf - -C "$HOME/.m2/wrapper/" --strip-components=1 --exclude="*/bin/mvnDebug" 2>/dev/null || true
+fi
+
+if [ -f "$MVN_CMD" ]; then
+  exec "$MVN_CMD" "$@"
+else
+  echo "ERROR: Cannot find or download Maven. Please install Maven 3.9+ and retry."
+  exit 1
+fi

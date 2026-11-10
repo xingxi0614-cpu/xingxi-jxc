@@ -1,0 +1,60 @@
+# 星嘻进销存 · 一条命令安装
+#   1. cp .env.example .env   然后打开 .env,把两个数据库密码改成你自己的
+#   2. docker compose up -d --build
+#   3. 浏览器打开 http://服务器地址:8080 ,用 admin 登录
+#      admin 的初始密码:没在 .env 里设 ADMIN_PASSWORD 的话,执行 docker compose logs backend | grep 初始密码 查看
+name: xingxi-jxc
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?请先在 .env 里设置 DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: scm
+      MYSQL_USER: scm
+      MYSQL_PASSWORD: ${DB_PASSWORD:?请先在 .env 里设置 DB_PASSWORD}
+      TZ: Asia/Shanghai
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db-data:/var/lib/mysql
+      # 第一次启动(数据卷为空)时自动建表并导入示例数据;以后启动不会再执行
+      - ./database/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/02-seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u scm scm -N -e 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    # 数据库端口不对外开放,只有后端能连
+
+  backend:
+    build:
+      context: .
+      dockerfile: deploy/backend.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/scm?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: scm
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SCM_ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      SCM_DEMO_PASSWORD: ${DEMO_PASSWORD:-}
+      SCM_COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    volumes:
+      - app-data:/data/scm      # 附件、工具箱生成的文件、日志
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
+volumes:
+  db-data:
+  app-data:

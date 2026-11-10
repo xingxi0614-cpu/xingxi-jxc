@@ -1,0 +1,20 @@
+/* 「操作」列按钮(RowActions.ts):一行排开,不折行;「更多」下拉里的删除/取消类操作保留原按钮的颜色提示 */
+.row-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.row-actions .el-button + .el-button,
+.row-actions .row-actions__more {
+  margin-left: 12px;
+}
+
+.row-actions__danger {
+  color: var(--el-color-danger) !important;
+}
+
+.row-actions__warning {
+  color: var(--el-color-warning) !important;
+}

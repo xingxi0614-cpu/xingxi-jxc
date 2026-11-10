@@ -1,0 +1,364 @@
+/* 查询面板(QueryDrawer.vue)的样式:单独成文件,组件本身保持在 400 行以内。不加 scoped——弹窗挂在 body 上、还要改页面表单项的样子 */
+.query-action-bar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.query-action-anchor {
+  display: none;
+}
+
+/* 挪进标题栏后：排在那排按钮最前面，间距跟其它按钮一致 */
+.query-action-bar--in-head {
+  order: -1;
+  gap: 8px;
+  margin: 0;
+}
+
+.query-action-bar--in-head .el-button + .el-button {
+  margin-left: 0;
+}
+
+.query-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 0 0 10px;
+  padding: 6px 10px;
+  border: 1px dashed var(--border-2);
+  border-radius: 8px;
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.query-chips__title {
+  color: var(--text-3);
+}
+
+.query-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 0 8px;
+  line-height: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--el-color-primary-light-7);
+  background: var(--el-color-primary-light-9);
+  color: var(--el-color-primary-dark-2);
+  overflow-wrap: anywhere;
+}
+
+.query-chip__x {
+  border: 0;
+  background: none;
+  padding: 0 0 0 2px;
+  cursor: pointer;
+  color: var(--text-3);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.query-chip__x:hover {
+  color: var(--el-color-danger);
+}
+
+.qp-mask {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.qp-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 980px;
+  max-width: 100%;
+  max-height: 88vh;
+  background: var(--el-bg-color);
+  border-radius: 22px;
+  box-shadow: var(--el-box-shadow-dark);
+  overflow: hidden;
+}
+
+.qp-head {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border-2);
+  color: var(--text-1);
+  font-size: 16px;
+}
+
+.qp-close {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-3);
+  cursor: pointer;
+}
+
+.qp-close:hover {
+  color: var(--el-color-primary);
+}
+
+.qp-body {
+  display: flex;
+  flex: 1;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.qp-pane-title {
+  color: var(--text-1);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.qp-side {
+  display: flex;
+  flex-direction: column;
+  width: 210px;
+  flex-shrink: 0;
+  padding: 12px 0;
+  border-right: 1px solid var(--border-2);
+  background: var(--el-fill-color-lighter);
+  overflow-y: auto;
+}
+
+.qp-side > .qp-pane-title {
+  padding: 0 14px 8px;
+}
+
+.qp-finder {
+  width: auto !important;
+  margin: 0 10px 8px;
+}
+
+.qp-item {
+  position: relative;
+  padding: 7px 14px 7px 26px;
+  border: 0;
+  background: none;
+  color: var(--text-2);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* 左栏每条前面一个小圆点;已经摆在右边的变成主色勾,一眼看出哪些在用 */
+.qp-item::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+
+.qp-item.is-on {
+  color: var(--el-color-primary);
+}
+
+.qp-item.is-on::before {
+  content: '✓';
+  width: auto;
+  height: auto;
+  left: 10px;
+  margin-top: -9px;
+  background: none;
+  font-size: 12px;
+}
+
+.qp-item:hover {
+  background: var(--el-fill-color-light);
+}
+
+.qp-empty {
+  padding: 8px 14px;
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.qp-main {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 20px 16px;
+  overflow-y: auto;
+}
+
+.qp-main-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.qp-hidden,
+.qp-dialog .qp-form .el-form .el-form-item.qp-hidden,
+.qp-quickbar .qp-form .el-form .el-form-item.qp-hidden {
+  display: none !important;
+}
+
+/*
+  右边一行一个条件:× | 条件名 | 查法 | 输入框(参考财务软件查询框)。
+  表单项是页面写的 inline 表单,Element Plus 给它 inline-flex 且样式后加载,所以这里要更具体 + !important 才盖得住。
+*/
+.qp-dialog .qp-form .el-form,
+.qp-dialog .qp-form .el-form--inline {
+  /* styles/index.scss 把卡片里的行内表单排成网格,这里必须改回普通排列 */
+  display: block !important;
+  margin: 0 !important;
+}
+
+.qp-dialog .qp-form .el-form .el-form-item {
+  display: grid !important;
+  grid-template-columns: 24px 120px 52px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 8px;
+  width: 100%;
+  margin: 0 0 10px !important;
+}
+
+.qp-dialog .qp-form .qp-row-x {
+  order: 1;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--border-2);
+  border-radius: 50%;
+  background: var(--el-bg-color);
+  color: var(--text-3);
+  font-size: 14px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.qp-dialog .qp-form .qp-row-x:hover {
+  border-color: var(--el-color-danger);
+  color: var(--el-color-danger);
+}
+
+/* 必选条件:占住 × 的位置让各行对齐,不可点(2026-10-19) */
+.qp-dialog .qp-form .qp-row-pin {
+  order: 1;
+  width: 22px;
+  height: 22px;
+}
+
+.qp-dialog .qp-form .el-form .el-form-item__label,
+.qp-dialog .qp-form .el-form .el-form-item__label-wrap {
+  order: 2;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  height: 32px;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border-radius: 6px;
+  background: var(--el-fill-color-light);
+  color: var(--text-2);
+  font-weight: 600;
+  line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.qp-dialog .qp-form .qp-row-op {
+  order: 3;
+  color: var(--text-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+.qp-dialog .qp-form .el-form-item__content {
+  order: 4;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+/* 页面上给控件写死的窄宽度(如 style="width:140px")在这里不适用,一律铺满这一行 */
+.qp-dialog .qp-form .el-form-item__content > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.qp-dialog .qp-form .el-input,
+.qp-dialog .qp-form .el-select,
+.qp-dialog .qp-form .el-date-editor,
+.qp-dialog .qp-form .el-date-editor.el-input__wrapper,
+.qp-dialog .qp-form .el-date-editor--daterange {
+  width: 100% !important;
+  min-width: 0;
+}
+
+.qp-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border-2);
+}
+
+.qp-foot .el-button + .el-button {
+  margin-left: 0;
+}
+
+.qp-count {
+  margin-right: auto;
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .qp-side {
+    width: 104px;
+  }
+
+  .qp-side > .qp-pane-title,
+  .qp-finder {
+    display: none;
+  }
+
+  .qp-item {
+    padding-left: 22px;
+    font-size: 13px;
+  }
+
+  .qp-body {
+    min-height: 320px;
+  }
+
+  .qp-main {
+    padding: 10px 12px;
+  }
+
+  /* 手机上收掉"查法"一列,条件名缩窄,把宽度让给输入框 */
+  .qp-form .el-form .el-form-item {
+    grid-template-columns: 22px 72px minmax(0, 1fr);
+  }
+
+  .qp-form .qp-row-op {
+    display: none;
+  }
+}

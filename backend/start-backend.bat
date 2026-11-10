@@ -1,0 +1,10 @@
+@echo off
+setlocal
+cd /d "%~dp0"
+
+if "%SPRING_PROFILES_ACTIVE%"=="" set SPRING_PROFILES_ACTIVE=dev
+if "%SPRING_DATASOURCE_USERNAME%"=="" set SPRING_DATASOURCE_USERNAME=scm
+if "%SPRING_DATASOURCE_PASSWORD%"=="" set SPRING_DATASOURCE_PASSWORD=scm@2026
+if "%SERVER_PORT%"=="" set SERVER_PORT=8080
+
+call mvnw.cmd spring-boot:run

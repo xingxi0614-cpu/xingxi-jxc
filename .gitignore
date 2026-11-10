@@ -1,0 +1,105 @@
+# ============================================================
+#  Git 忽略文件
+# ============================================================
+
+# 生产环境变量（绝不提交！）
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+!.env.*.example
+
+# 私钥、证书、账号凭据（绝不提交）
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+*.csr
+id_rsa*
+id_ed25519*
+runtime/secrets/
+*credentials*.json
+*credential*.json
+*password*.txt
+*secret*.txt
+
+# Maven 构建产物
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Node modules 和构建产物
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/test-results/
+*.tsbuildinfo
+
+# 本地运行、审计截图、打包产物
+runtime/*
+!runtime/cloud-acceptance.ps1
+!runtime/cloud-temp-acceptance.ps1
+!runtime/cloud_full_audit.mjs
+dist/
+output/
+frontend/output/
+frontend/runtime/
+mobile/**/build/
+# 安卓签名私钥与口令：丢了就再也发不了升级包，泄露了别人能冒名发包，一律不进仓库
+*.jks
+*.keystore
+keystore.properties
+# 打好的安装包不入库（体积大且每次都变），发布走服务器
+*.apk
+*.aab
+mobile/**/.gradle/
+**/local.properties
+.playwright-cli/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+/logs/
+*.out
+*.err
+
+# 前端系统日志页面是源码，不是运行日志
+!frontend/src/views/system/logs/
+!frontend/src/views/system/logs/**
+
+# SSL 证书（私钥绝不提交）
+ssl/
+
+# 备份文件
+backup/
+backups/
+*.sql
+*.sql.gz
+*.zip
+*.tgz
+*.bak
+*.backup
+
+# 「数据备份」页面是源码，不是备份文件(曾被上面的 backup/ 误挡在仓库外，干净目录打包后线上 404)
+!frontend/src/views/system/backup/
+!frontend/src/views/system/backup/**
+
+# 项目数据库结构和增量迁移必须提交
+!database/*.sql
+!database/migrations/*.sql
+# 存货核算切换/回滚脚本是源码(2026-10-15),别被上面的 *.sql 备份规则挡在仓库外
+!scripts/cost-*.sql
+
+# Python 运行时缓存
+__pycache__/
+*.pyc
