@@ -16,7 +16,7 @@
 
     <groupId>com.group.scm</groupId>
     <artifactId>scm-backend</artifactId>
-    <version>1.11.0</version>
+    <version>1.0.0</version>
     <name>scm-backend</name>
     <description>集团进销存协同平台 · 后端</description>
 

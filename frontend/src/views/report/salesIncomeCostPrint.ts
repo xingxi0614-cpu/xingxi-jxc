@@ -28,7 +28,7 @@ export interface IncomeCostData {
 export const KIND_NAME = '商品销售'
 export const reportTitle = () => `${KIND_NAME}收入成本明细表`
 const SCOPE_NOTE = '口径：仅含销售模块。收入=已审批销售发票不含税金额(按开票日期归月)；成本=对应销售出库单结转成本(移动加权平均)；'
-  + '退货按退货日期冲减当月。材料出库/领料(零星改造等)不在本表；采购发票与入库差异见"采购成本差异调整表"。'
+  + '退货按退货日期冲减当月。材料出库/领料(维修改造等)不在本表；采购发票与入库差异见"采购成本差异调整表"。'
 
 export const pct = (v: any) => (v === null || v === undefined || v === '' ? '—' : `${Number(v).toFixed(1)}%`)
 export const taxRateLabel = (r: any) => r.mixed_rate

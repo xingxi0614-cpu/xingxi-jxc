@@ -2,9 +2,11 @@
 FROM maven:3.9.9-eclipse-temurin-17 AS build
 WORKDIR /src
 COPY backend/pom.xml .
-RUN mvn -q -B dependency:go-offline
+# 先把依赖下载下来(这一层会被缓存)。网络抖动时偶尔会断,断了不算失败,下一步会补下载。
+RUN mvn -q -B dependency:go-offline || true
 COPY backend/src ./src
-RUN mvn -q -B -DskipTests package
+# 打包;下载依赖遇到网络错误时最多重试 3 次
+RUN for i in 1 2 3; do mvn -q -B -DskipTests package && exit 0; echo "打包失败,第 $i 次重试…"; sleep 5; done; exit 1
 
 FROM eclipse-temurin:17-jre-jammy
 # mysqldump:「数据备份 → 下载整库备份」要用

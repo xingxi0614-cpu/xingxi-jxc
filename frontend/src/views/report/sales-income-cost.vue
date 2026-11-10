@@ -31,7 +31,7 @@
       <KpiCards v-if="data" :items="kpis" />
 
       <el-alert type="info" :closable="false" class="mb-2">
-        本表范围：<b>销售模块</b>（{{ KIND_NAME }}），税率 <b>{{ data ? Number(data.taxRate) : 13 }}%</b>；材料出库/领料（零星改造等）不在本表。
+        本表范围：<b>销售模块</b>（{{ KIND_NAME }}），税率 <b>{{ data ? Number(data.taxRate) : 13 }}%</b>；材料出库/领料（维修改造等）不在本表。
         <template v-if="data">　编制单位：<b>{{ data.company.name }}</b></template>
       </el-alert>
       <el-alert v-if="data?.unapprovedInvoices" type="warning" :closable="false" show-icon class="mb-2"
